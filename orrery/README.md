@@ -9,4 +9,6 @@ The design was first made in 3D with SolidWorks. Artwork was edited in Affinity 
 
 Tolerances can be adjusted within the SVG file, as I have converted some path objects to circles and rectangles, so the diameters and widths can be manipulated easily. This is so it can accomodate varying laser beams, wood thicknesses, dowel diameters, etc.
 
+Instructions are provided, see the "instructions" directory.
+
 Originally inspired by https://www.dreipunkt-verlag.de/shop/baus%C3%A4tze/bausatz-tellurium/ , my design is much smaller and require only a small laser cutter.
