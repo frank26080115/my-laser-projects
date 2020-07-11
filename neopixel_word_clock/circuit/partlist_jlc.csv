@@ -1,0 +1,14 @@
+2,"C1, C2",1210,22uF,C8020,"capacitor, tantalum"
+6,"C3, C4, C5, C8, C9, C10",0604,100nF,C14663,"capacitor, chip"
+3,"D1, D2, D3",SOD-323,,C146335,"diode, schotky"
+1,D4,SMA,,C2480,"diode, schotky"
+1,IC1,SOT-223,LM1117-3V3,C6186,v-reg
+2,"R1, R3",0604,10Kê,C25804,"resistor, chip"
+1,R2,0604,100ê,C22775,"resistor, chip"
+2,"R4, R5",0604,1Kê,C21190,"resistor, chip"
+3,"S1, S2, S5",TACT-SW,,C318886,tactile switch
+1,U1,LQFP-32,STM32L052K8T6,C124724,MCU
+1,Y1,XTAL-3.2x1.5,32.768 kHz,C32346,crystal
+1,IC2,SC-70,TXS0101,C132031,v-translater
+2,"LED1, LED2",0604,,C72043,
+1,BAT1,,,C70377,battery
