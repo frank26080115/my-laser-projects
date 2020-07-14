@@ -31,4 +31,11 @@
 #define WORD_BUFF_LEN    8
 #define LETTER_BUFF_LEN 64
 
+//#define DEBUG_FRAMEBUFFER
+//#define DEBUG_FRAMESHADE
+//#define DEBUG_WORDBUFFER
+//#define DEBUG_PRESERVEDROW
+//#define DEBUG_FADESTYLE
+//#define DEBUG_LIGHTLEVEL
+
 #endif /* INC_CONFIGS_H_ */

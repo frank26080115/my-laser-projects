@@ -40,7 +40,7 @@ void SystemClock_Config_KeepRTC(void)
 
   }
 
-#if 0 // code section intentially disabled, so that the RTC can continue to operate from wake-up
+#if 0 // code section intentionally disabled, so that the RTC can continue to operate from wake-up
   LL_PWR_EnableBkUpAccess();
   LL_RCC_ForceBackupDomainReset();
   LL_RCC_ReleaseBackupDomainReset();

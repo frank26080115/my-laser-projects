@@ -161,12 +161,6 @@ void test_fade(void)
 
 void tests(void)
 {
-	char* tmpstr = (char*)rgbw_buffer;
-	printf("HAL Version    0x%08lX\r\n", HAL_GetHalVersion());
-	printf("DBGMCU->IDCODE 0x%08lX\r\n", DBGMCU->IDCODE);
-	printf("UID 0x%08lX 0x%08lX 0x%08lX\r\n", HAL_GetUIDw0(), HAL_GetUIDw1(), HAL_GetUIDw2());
-	printf("Version Info:\r\n%s\r\n", version_string(tmpstr));
-	printf("Version CRC: 0x%08lX\r\n", HAL_CRC_Calculate(&hcrc, (uint32_t*)tmpstr, (uint32_t)strlen(tmpstr)));
 	//test_systick();
 	//test_adc();
 	//test_btns();
@@ -175,5 +169,5 @@ void tests(void)
 	//test_pwr();
 	//test_rng();
 	//test_clock();
-	test_fade();
+	//test_fade();
 }

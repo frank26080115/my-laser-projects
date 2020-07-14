@@ -165,7 +165,9 @@ void show_time(RTC_TimeTypeDef* t, uint8_t fadeInStyle, uint8_t fadeOutStyle)
 			fadeOutStyle = LL_RNG_ReadRandData32(RNG) % FADEOUT_RANDOM;
 		}
 		while (fadeOutStyle <= FADEOUT_INSTANT_3 || (word_buffer_idx <= 0 && fadeOutStyle >= FADEOUT_SNOW && fadeOutStyle <= FADEOUT_SNOW_3));
+#ifdef DEBUG_FADESTYLE
 		printf("fade out style %u\r\n", fadeOutStyle);
+#endif
 	}
 
 	fadeStep = 0x200 / (1000 / FRAME_DELAY);
@@ -201,13 +203,17 @@ void show_time(RTC_TimeTypeDef* t, uint8_t fadeInStyle, uint8_t fadeOutStyle)
 	reset_buffers();
 	pack_minute_word(rounded.Minutes);
 	pack_hour_word(rounded.Hours, rounded.Minutes);
+#ifdef DEBUG_WORDBUFFER
 	debug_wordbuffer();
+#endif
 
 	if (fadeInStyle == FADEIN_RANDOM) {
 		// do not allow instant fade-in when using random mode
 		fadeInStyle = LL_RNG_ReadRandData32(RNG) % (FADEIN_RANDOM - 1);
 		fadeInStyle++;
+#ifdef DEBUG_FADESTYLE
 		printf("fade in style %u\r\n", fadeInStyle);
+#endif
 	}
 
 	// choose appropriate fade in speeds and brightness levels based on detected light levels
@@ -248,7 +254,9 @@ void show_time(RTC_TimeTypeDef* t, uint8_t fadeInStyle, uint8_t fadeOutStyle)
 		break;
 	}
 
+#ifdef DEBUG_FRAMEBUFFER
 	debug_framebuffer();
+#endif
 }
 
 // round the time to the nearest 5 minutes
@@ -279,7 +287,7 @@ void round_time(RTC_TimeTypeDef* tin, RTC_TimeTypeDef* tout)
 	}
 
 	if (rounded_minute >= 60) {
-		rounded_mintue = 0;
+		rounded_minute = 0;
 		rounded_hour += 1;
 	}
 
@@ -336,6 +344,12 @@ void check_preserved_rows(RTC_TimeTypeDef* now, RTC_TimeTypeDef* prev)
 			) {
 		preserveRow = 3;
 	}
+
+#ifdef DEBUG_PRESERVEDROW
+	if (preserveRow != MATRIX_HEIGHT) {
+		printf("preserve row %u\r\n", preserveRow);
+	}
+#endif
 }
 
 // place the words about the minute into the word buffer
@@ -510,7 +524,6 @@ void handle_buttons(RTC_TimeTypeDef* now, RTC_TimeTypeDef* prev)
 	do
 	{
 		uint8_t btnbits = ((btn_is_pressed_up() ? 1 : 0) << 1) | (btn_is_pressed_down() ? 1 : 0);
-		int contCnt = 0;
 		loop = 0;
 		RTC_TimeTypeDef tmp;
 
@@ -522,6 +535,7 @@ void handle_buttons(RTC_TimeTypeDef* now, RTC_TimeTypeDef* prev)
 			time_add_mins(now, now, -5);
 		}
 		else {
+			// 0 or 3
 			break;
 		}
 
@@ -669,24 +683,30 @@ void debug_frameshade(void)
 	}
 }
 
+void debug_word(uint8_t word_code)
+{
+	uint8_t li;
+	uint8_t* letters = (uint8_t*)(word_list[word_code]);
+	for (li = 0; ;)
+	{
+		uint8_t letter = letters[li];
+		li++;
+		if (letter == 0xFF) { // end of word
+			printf(" ");
+			break;
+		}
+		printf("%c", letter_arrangement[letter]);
+	}
+}
+
 void debug_wordbuffer(void)
 {
-	uint8_t wi, li;
+	uint8_t wi;
 	printf("> ");
 	for (wi = 0; wi < word_buffer_idx; wi++)
 	{
 		uint8_t word_code = word_buffer[wi];
-		uint8_t* letters = (uint8_t*)(word_list[word_code]);
-		for (li = 0; ;)
-		{
-			uint8_t letter = letters[li];
-			li++;
-			if (letter == 0xFF) { // end of word
-				printf(" ");
-				break;
-			}
-			printf("%c", letter_arrangement[letter]);
-		}
+		debug_word(word_code);
 	}
 	printf("<\r\n");
 }

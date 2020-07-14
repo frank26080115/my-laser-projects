@@ -59,6 +59,7 @@ void power_init(void)
 		printf(" AGAIN");
 	}
 	printf(" =============\r\n");
+	print_info();
 }
 
 void EXTI0_1_IRQHandler(void)

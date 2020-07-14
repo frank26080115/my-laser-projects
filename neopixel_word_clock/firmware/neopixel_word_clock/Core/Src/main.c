@@ -14,7 +14,6 @@ Author: Frank Zhao https://www.eleccelerator.com/
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "usb_device.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -100,7 +99,6 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_ADC_Init();
-  MX_USB_DEVICE_Init();
   MX_RTC_Init();
   MX_USART1_UART_Init();
   MX_RNG_Init();
@@ -160,9 +158,9 @@ void SystemClock_Config(void)
     
   }
   LL_PWR_EnableBkUpAccess();
-  //LL_RCC_ForceBackupDomainReset();
-  //LL_RCC_ReleaseBackupDomainReset();
-  LL_RCC_LSE_SetDriveCapability(LL_RCC_LSEDRIVE_LOW);
+  LL_RCC_ForceBackupDomainReset();
+  LL_RCC_ReleaseBackupDomainReset();
+  LL_RCC_LSE_SetDriveCapability(LL_RCC_LSEDRIVE_MEDIUMLOW);
   LL_RCC_LSE_Enable();
 
    /* Wait till LSE is ready */
@@ -199,7 +197,6 @@ void SystemClock_Config(void)
   };
   LL_RCC_SetUSARTClockSource(LL_RCC_USART1_CLKSOURCE_PCLK2);
   LL_RCC_SetRNGClockSource(LL_RCC_RNG_CLKSOURCE_HSI48);
-  LL_RCC_SetUSBClockSource(LL_RCC_USB_CLKSOURCE_HSI48);
 }
 
 /**
@@ -372,8 +369,8 @@ static void MX_RTC_Init(void)
   */
   hrtc.Instance = RTC;
   hrtc.Init.HourFormat = RTC_HOURFORMAT_12;
-  hrtc.Init.AsynchPrediv = 0x7F;
-  hrtc.Init.SynchPrediv = 0xFF;
+  hrtc.Init.AsynchPrediv = 127;
+  hrtc.Init.SynchPrediv = 255;
   hrtc.Init.OutPut = RTC_OUTPUT_DISABLE;
   hrtc.Init.OutPutRemap = RTC_OUTPUT_REMAP_NONE;
   hrtc.Init.OutPutPolarity = RTC_OUTPUT_POLARITY_HIGH;
@@ -536,6 +533,18 @@ static void MX_GPIO_Init(void)
   LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
   /**/
+  GPIO_InitStruct.Pin = LL_GPIO_PIN_11;
+  GPIO_InitStruct.Mode = LL_GPIO_MODE_ANALOG;
+  GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
+  LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+  /**/
+  GPIO_InitStruct.Pin = LL_GPIO_PIN_12;
+  GPIO_InitStruct.Mode = LL_GPIO_MODE_ANALOG;
+  GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
+  LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+  /**/
   GPIO_InitStruct.Pin = LL_GPIO_PIN_15;
   GPIO_InitStruct.Mode = LL_GPIO_MODE_ANALOG;
   GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
@@ -606,6 +615,16 @@ int adc_read(uint32_t ch)
 		}
 	}
 	return (int)res;
+}
+
+void print_info(void)
+{
+	char* tmpstr = (char*)rgbw_buffer;
+	printf("HAL Version    0x%08lX\r\n", HAL_GetHalVersion());
+	printf("DBGMCU->IDCODE 0x%08lX\r\n", DBGMCU->IDCODE);
+	printf("UID 0x%08lX 0x%08lX 0x%08lX\r\n", HAL_GetUIDw0(), HAL_GetUIDw1(), HAL_GetUIDw2());
+	printf("Version Info:\r\n%s\r\n", version_string(tmpstr));
+	printf("Version CRC: 0x%08lX\r\n", HAL_CRC_Calculate(&hcrc, (uint32_t*)tmpstr, (uint32_t)strlen(tmpstr)));
 }
 
 /* USER CODE END 4 */

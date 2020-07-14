@@ -61,6 +61,10 @@ void fade_in_all(int16_t brite_step, int16_t brite_limit, char stopAt)
 		for (wi = 0; wi < word_buffer_idx; wi++)
 		{
 			uint8_t word_code = word_buffer[wi];
+			if ((preserveRow == 3 && (word_code == WORD_MINUTE_TO || word_code == WORD_MINUTE_PAST))
+					|| (preserveRow == 4 && word_code >= WORD_HOUR_TWELVE)) {
+				continue;
+			}
 			uint8_t* letters = (uint8_t*)(word_list[word_code]);
 			for (li = 0; ;)
 			{
@@ -69,7 +73,8 @@ void fade_in_all(int16_t brite_step, int16_t brite_limit, char stopAt)
 				if (letter == 0xFF) { // end of word
 					break;
 				}
-				if (letter < get_xy_idx(0, preserveRow)) {
+				//if (letter < get_xy_idx(0, preserveRow))
+				{
 					sum += pixel_brighten_linear(&(hsv_buffer[letter]), brite_step, stopAt);
 					// return of 1 means still more to go
 					did = 1;
@@ -125,7 +130,7 @@ void fade_in_words_all(int16_t brite_step, int16_t brite_limit, char stopAt)
 	for (i = 0; i < word_buffer_idx; i++)
 	{
 		uint8_t word_code = word_buffer[i];
-		if (preserveRow == 3 && (word_code == WORD_MINUTE_TO || WORD_MINUTE_PAST)) {
+		if (preserveRow == 3 && (word_code == WORD_MINUTE_TO || word_code == WORD_MINUTE_PAST)) {
 			continue;
 		}
 		if (preserveRow == 4 && word_code >= WORD_HOUR_TWELVE) {
@@ -168,7 +173,11 @@ void snow_in_letters(int16_t brite_step, int16_t brite_limit, char stopAt)
 	shuffle_letters();
 	for (i = 0; i < letter_buffer_idx; i++)
 	{
-		fade_in_letter(brite_step, brite_limit, stopAt, letter_buffer[i]);
+		uint8_t letter = letter_buffer[i];
+		if (letter >= get_xy_idx(0, preserveRow)) {
+			continue;
+		}
+		fade_in_letter(brite_step, brite_limit, stopAt, letter);
 	}
 }
 
@@ -200,7 +209,11 @@ void snow_out_letters(int16_t brite_step)
 	shuffle_letters();
 	for (i = 0; i < letter_buffer_idx; i++)
 	{
-		fade_out_letter(brite_step, letter_buffer[i]);
+		uint8_t letter = letter_buffer[i];
+		if (letter >= get_xy_idx(0, preserveRow)) {
+			continue;
+		}
+		fade_out_letter(brite_step, letter);
 	}
 }
 

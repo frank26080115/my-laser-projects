@@ -15,6 +15,7 @@
 
 void SystemClock_Config_KeepRTC(void);
 
+void print_info(void);
 void clock_task(void);
 void reset_buffers(void);
 void show_time(RTC_TimeTypeDef* t, uint8_t fadeInStyle, uint8_t fadeOutStyle);
@@ -28,6 +29,7 @@ void shuffle_letters(void);
 void handle_buttons(RTC_TimeTypeDef* now, RTC_TimeTypeDef* prev);
 char handle_lightlevels(void);
 void debug_framebuffer(void);
+void debug_word(uint8_t word_code);
 void debug_wordbuffer(void);
 void debug_frameshade(void);
 uint8_t light_read(void);

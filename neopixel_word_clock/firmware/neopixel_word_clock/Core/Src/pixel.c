@@ -156,7 +156,9 @@ void show_strip(int32_t dly)
 	// do conversion between buffer types
 	hsv_to_rgbw_buffer(hsv_buffer, rgbw_buffer, MATRIX_TOTAL);
 
-	//debug_frameshade();
+#ifdef DEBUG_FRAMESHADE
+	debug_frameshade();
+#endif
 
 	// set the new frame
 	// (this doesn't need to be here since it's always the same, but you won't notice the performance)
