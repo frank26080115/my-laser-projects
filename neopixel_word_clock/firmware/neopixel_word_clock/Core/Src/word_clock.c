@@ -162,7 +162,7 @@ void show_time(RTC_TimeTypeDef* t, uint8_t fadeInStyle, uint8_t fadeOutStyle)
 		// when using randomization, do not allow instant fading mode, just to be interesting
 		// also prevent the snow effect fade-out if it's the first ever fade-out
 		do {
-			fadeOutStyle = LL_RNG_ReadRandData32(RNG) % FADEOUT_RANDOM;
+			fadeOutStyle = rand_read() % FADEOUT_RANDOM;
 		}
 		while (fadeOutStyle <= FADEOUT_INSTANT_3 || (word_buffer_idx <= 0 && fadeOutStyle >= FADEOUT_SNOW && fadeOutStyle <= FADEOUT_SNOW_3));
 #ifdef DEBUG_FADESTYLE
@@ -209,7 +209,7 @@ void show_time(RTC_TimeTypeDef* t, uint8_t fadeInStyle, uint8_t fadeOutStyle)
 
 	if (fadeInStyle == FADEIN_RANDOM) {
 		// do not allow instant fade-in when using random mode
-		fadeInStyle = LL_RNG_ReadRandData32(RNG) % (FADEIN_RANDOM - 1);
+		fadeInStyle = rand_read() % (FADEIN_RANDOM - 1);
 		fadeInStyle++;
 #ifdef DEBUG_FADESTYLE
 		printf("fade in style %u\r\n", fadeInStyle);
@@ -420,15 +420,15 @@ void words_to_letters(void)
 // use random number generator to shuffle the letter ordering, for the random snow effect
 void shuffle_letters(void)
 {
-	uint32_t prnd = LL_RNG_ReadRandData32(RNG), rnd;
+	uint32_t prnd = rand_read(), rnd;
 	uint8_t i;
 	for (i = 0; i < letter_buffer_idx; i++)
 	{
-		while ((rnd = LL_RNG_ReadRandData32(RNG)) == prnd) {
+		while ((rnd = rand_read()) == prnd) {
 			// wait for new random number
 			__NOP();
 		}
-		while (((rnd = LL_RNG_ReadRandData32(RNG)) % letter_buffer_idx) == i) {
+		while (((rnd = rand_read()) % letter_buffer_idx) == i) {
 			// prevent swaps with self
 			__NOP();
 		}

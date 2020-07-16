@@ -60,6 +60,10 @@ void power_init(void)
 	}
 	printf(" =============\r\n");
 	print_info();
+
+#ifndef STM32L052xx
+	srand(adc_read(ADCCHAN_LIGHT));
+#endif
 }
 
 void EXTI0_1_IRQHandler(void)

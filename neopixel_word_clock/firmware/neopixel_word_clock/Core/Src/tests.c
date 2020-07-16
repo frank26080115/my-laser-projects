@@ -123,7 +123,7 @@ void test_rng(void)
 	uint32_t i = 0;
 	while (1)
 	{
-		printf("RNG[%lu] 0x%08lX\r\n", i, LL_RNG_ReadRandData32(RNG));
+		printf("RNG[%lu] 0x%08lX\r\n", i, rand_read());
 		HAL_Delay(200);
 		i++;
 	}

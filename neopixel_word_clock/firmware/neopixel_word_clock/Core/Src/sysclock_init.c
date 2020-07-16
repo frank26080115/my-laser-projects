@@ -32,13 +32,24 @@ void SystemClock_Config_KeepRTC(void)
 
   }
   LL_RCC_HSI_SetCalibTrimming(16);
+#ifdef STM32L052xx
   LL_RCC_HSI48_Enable();
+#else
+  LL_RCC_HSI_Enable();
+#endif
 
-   /* Wait till HSI48 is ready */
+   /* Wait till HSI is ready */
+#ifdef STM32L052xx
   while(LL_RCC_HSI48_IsReady() != 1)
   {
 
   }
+#else
+  while(LL_RCC_HSI_IsReady() != 1)
+  {
+
+  }
+#endif
 
 #if 0 // code section intentionally disabled, so that the RTC can continue to operate from wake-up
   LL_PWR_EnableBkUpAccess();
@@ -83,6 +94,8 @@ void SystemClock_Config_KeepRTC(void)
     Error_Handler();
   };
   LL_RCC_SetUSARTClockSource(LL_RCC_USART1_CLKSOURCE_PCLK2);
+#ifdef STM32L052xx
   LL_RCC_SetRNGClockSource(LL_RCC_RNG_CLKSOURCE_HSI48);
   LL_RCC_SetUSBClockSource(LL_RCC_USB_CLKSOURCE_HSI48);
+#endif
 }

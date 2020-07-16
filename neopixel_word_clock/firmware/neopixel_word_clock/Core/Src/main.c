@@ -54,7 +54,6 @@ static void MX_GPIO_Init(void);
 static void MX_ADC_Init(void);
 static void MX_RTC_Init(void);
 static void MX_USART1_UART_Init(void);
-static void MX_RNG_Init(void);
 static void MX_CRC_Init(void);
 /* USER CODE BEGIN PFP */
 
@@ -101,7 +100,6 @@ int main(void)
   MX_ADC_Init();
   MX_RTC_Init();
   MX_USART1_UART_Init();
-  MX_RNG_Init();
   MX_CRC_Init();
   /* USER CODE BEGIN 2 */
 	power_init();
@@ -150,13 +148,6 @@ void SystemClock_Config(void)
     
   }
   LL_RCC_HSI_SetCalibTrimming(16);
-  LL_RCC_HSI48_Enable();
-
-   /* Wait till HSI48 is ready */
-  while(LL_RCC_HSI48_IsReady() != 1)
-  {
-    
-  }
   LL_PWR_EnableBkUpAccess();
   LL_RCC_ForceBackupDomainReset();
   LL_RCC_ReleaseBackupDomainReset();
@@ -196,7 +187,6 @@ void SystemClock_Config(void)
     Error_Handler();  
   };
   LL_RCC_SetUSARTClockSource(LL_RCC_USART1_CLKSOURCE_PCLK2);
-  LL_RCC_SetRNGClockSource(LL_RCC_RNG_CLKSOURCE_HSI48);
 }
 
 /**
@@ -300,31 +290,6 @@ static void MX_CRC_Init(void)
   /* USER CODE BEGIN CRC_Init 2 */
 
   /* USER CODE END CRC_Init 2 */
-
-}
-
-/**
-  * @brief RNG Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_RNG_Init(void)
-{
-
-  /* USER CODE BEGIN RNG_Init 0 */
-
-  /* USER CODE END RNG_Init 0 */
-
-  /* Peripheral clock enable */
-  LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_RNG);
-
-  /* USER CODE BEGIN RNG_Init 1 */
-
-  /* USER CODE END RNG_Init 1 */
-  LL_RNG_Enable(RNG);
-  /* USER CODE BEGIN RNG_Init 2 */
-
-  /* USER CODE END RNG_Init 2 */
 
 }
 
@@ -590,7 +555,7 @@ int __io_putchar(int ch)
 		__NOP();
 	}
 	LL_USART_TransmitData8(USART1, ch);
-#if defined(USE_USB_PORT) && defined(USB) && defined(HAL_PCD_MODULE_ENABLED)
+#if defined(STM32L052xx) && defined(USE_USB_PORT) && defined(USB) && defined(HAL_PCD_MODULE_ENABLED)
 	usb_putchar(ch);
 #endif
 	return 1;
@@ -615,6 +580,15 @@ int adc_read(uint32_t ch)
 		}
 	}
 	return (int)res;
+}
+
+uint32_t rand_read(void)
+{
+#if defined(RNG) && defined(STM32L0xx_LL_RNG_H)
+	return LL_RNG_ReadRandData32(RNG);
+#else
+	return rand();
+#endif
 }
 
 void print_info(void)
