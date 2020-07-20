@@ -24,8 +24,21 @@ void test_adc(void)
 {
 	while (1)
 	{
-		printf("light %d , pot A %d , pot B %d\r\n", adc_read(ADCCHAN_LIGHT), adc_read(ADCCHAN_POT_A), adc_read(ADCCHAN_POT_B));
+		//printf("light %d , pot A %d , pot B %d\r\n", adc_read(ADCCHAN_LIGHT), adc_read(ADCCHAN_POT_A), adc_read(ADCCHAN_POT_B));
+		printf("light %d\r\n", adc_read(ADCCHAN_LIGHT));
 		HAL_Delay(1000);
+	}
+}
+
+void test_hb(void)
+{
+	while(1)
+	{
+		hbled_on();
+		printf("systick %lu\r\n", HAL_GetTick());
+		HAL_Delay(500);
+		hbled_off();
+		HAL_Delay(500);
 	}
 }
 
@@ -53,29 +66,46 @@ void show_strip(int32_t dly);
 
 void test_leds(void)
 {
-	uint8_t i, j = 0, loop = 0;
+	uint8_t i, j = 0, mode = 0, loop = 0;
 
 	while (1)
 	{
+		// wait for previous to finish
+		while (ws2812b.transfer_complete == 0) {
+			__NOP();
+		}
+
 		for (i = 0; i < MATRIX_TOTAL; i++)
 		{
-			uint8_t x = j != i ? 0 : 0xFF;
-			hsv_buffer[i].s = 0;
-			hsv_buffer[i].v = x;
-			hsv_buffer[i].w = x;
-			rgbw_buffer[i].r = x;
-			rgbw_buffer[i].g = x;
-			rgbw_buffer[i].b = x;
-			rgbw_buffer[i].w = x;
+			uint8_t x = j != i ? 0 : 0x10;
+			rgbw_buffer[i].r = (mode == 0 || mode == 4) ? x : 0;
+			rgbw_buffer[i].g = (mode == 1 || mode == 4) ? x : 0;
+			rgbw_buffer[i].b = (mode == 2 || mode == 4) ? x : 0;
+			rgbw_buffer[i].w = (mode == 3) ? x : 0;
 		}
 		j++;
 		j %= MATRIX_TOTAL;
 
-		show_strip(200);
+		debug_framebuffer();
+
+		// set the new frame
+		// (this doesn't need to be here since it's always the same, but you won't notice the performance)
+		ws2812b.item[0].frame_buffer_pointer = (uint8_t*)rgbw_buffer;
+		ws2812b.item[0].frame_buffer_size = sizeof(rgbw_t) * MATRIX_TOTAL;
+		ws2812b.item[0].frame_buffer_counter = 0;
+		ws2812b.item[0].channel = 0;
+
+		// fire up the DMA transfer to the LEDs
+		ws2812b.start_transfer = 1;
+		ws2812b_handle();
+
+		HAL_Delay(50);
 
 		if (j == 0) {
 			loop++;
 			printf("loop %u\r\n", loop);
+			mode++;
+			mode %= 5;
 		}
 	}
 }
@@ -159,10 +189,49 @@ void test_fade(void)
 	}
 }
 
+void test_demo(void)
+{
+	static char notFirstRun = 0;
+
+	static const uint8_t time_tbl[] = {
+			5, 40,      // twenty to six
+			6, 15,      // quarter past six
+			9, 55,      // five to ten
+			3, 30,      // half past three
+			0xFF, 0xFF  // end of table
+	};
+	uint8_t tbl_idx = 0;
+
+	RTC_TimeTypeDef now = {0};
+	RTC_TimeTypeDef prev = {0};
+	while (1)
+	{
+		now.Hours = time_tbl[tbl_idx];
+		now.Minutes = time_tbl[tbl_idx + 1];
+		if (now.Hours == 0xFF || now.Minutes == 0xFF) {
+			tbl_idx = 0;
+			continue;
+		}
+		tbl_idx += 2;
+
+		if (notFirstRun == 0) {
+			preserveRow = MATRIX_HEIGHT;
+		}
+		else {
+			check_preserved_rows(&now, &prev);
+		}
+		show_time(&now, FADEIN_RANDOM, FADEOUT_RANDOM);
+		HAL_Delay(3000);
+		memcpy(&prev, &now, sizeof(RTC_TimeTypeDef));
+		notFirstRun = 1;
+	}
+}
+
 void tests(void)
 {
 	//test_systick();
 	//test_adc();
+	//test_hb();
 	//test_btns();
 	//test_leds();
 	//test_rtc();
@@ -170,4 +239,5 @@ void tests(void)
 	//test_rng();
 	//test_clock();
 	//test_fade();
+	//test_demo();
 }

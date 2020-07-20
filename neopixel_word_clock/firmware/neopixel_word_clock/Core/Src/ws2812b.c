@@ -299,7 +299,7 @@ static void ws2812b_send()
 #error
 #endif
 
-	__HAL_DBGMCU_FREEZE_TIM2();
+	//__HAL_DBGMCU_FREEZE_TIM2();
 
 	// start TIM2
 	__HAL_TIM_ENABLE(&timer2_handle);

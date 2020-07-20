@@ -43,7 +43,7 @@ void hsv_to_rgbw(pix_t* inPtr, rgbw_t* outPtr);
 void hsv_to_rgbw_buffer(pix_t* inPtr, rgbw_t* outPtr, uint8_t cnt);
 char pixel_brighten_linear(pix_t* pix, int16_t x, char stopAt);
 
-void set_shown_svw(int16_t s, int16_t v, int16_t w);
+void set_shown_hsvw(int16_t h, int16_t s, int16_t v, int16_t w);
 void set_all_svw(int16_t s, int16_t v, int16_t w);
 void blank_all(uint8_t s);
 void fade_in_all(int16_t brite_step, int16_t brite_limit, char stopAt);
@@ -52,7 +52,9 @@ void fade_out_all(int16_t dim);
 void fade_in_word(int16_t brite_step, int16_t brite_limit, char stopAt, uint8_t word_code);
 void fade_in_words_all(int16_t brite_step, int16_t brite_limit, char stopAt);
 void fade_in_letter(int16_t brite_step, int16_t brite_limit, char stopAt, uint8_t letter);
+void fade_in_letters(int16_t brite_step, int16_t brite_limit, char stopAt, char shuffle);
 void snow_in_letters(int16_t brite_step, int16_t brite_limit, char stopAt);
+void wipe_in_letters(int16_t brite_step, int16_t brite_limit, char stopAt);
 void fade_out_letter(int16_t brite_step, uint8_t letter);
 void snow_out_letters(int16_t brite_step);
 void wipe_out(int16_t brite_step, int rowDly, uint8_t mode);

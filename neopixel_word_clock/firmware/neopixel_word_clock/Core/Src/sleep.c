@@ -17,6 +17,8 @@ void sleep(void)
 	/* Enable GPIOC clock */
 	LL_IOP_GRP1_EnableClock(LL_IOP_GRP1_PERIPH_GPIOA);
 
+	hbled_off();
+
 	/* Configure PA0 pin as input floating */
 	GPIO_InitStruct.Pin = LL_GPIO_PIN_0;
 	GPIO_InitStruct.Mode = LL_GPIO_MODE_INPUT;
@@ -51,15 +53,6 @@ void power_init(void)
 	LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
 	LL_PWR_EnableBkUpAccess();
-
-	printf("\r\n\r\nHELLO WORLD");
-
-	if(__HAL_PWR_GET_FLAG(PWR_FLAG_SB) != RESET) {
-		__HAL_PWR_CLEAR_FLAG(PWR_FLAG_SB);
-		printf(" AGAIN");
-	}
-	printf(" =============\r\n");
-	print_info();
 
 #ifndef STM32L052xx
 	srand(adc_read(ADCCHAN_LIGHT));

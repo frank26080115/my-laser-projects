@@ -166,11 +166,13 @@ void fade_in_letter(int16_t brite_step, int16_t brite_limit, char stopAt, uint8_
 	while (sum != 0 && brite_limit > 0);
 }
 
-void snow_in_letters(int16_t brite_step, int16_t brite_limit, char stopAt)
+void fade_in_letters(int16_t brite_step, int16_t brite_limit, char stopAt, char shuffle)
 {
 	uint8_t i;
 	words_to_letters();
-	shuffle_letters();
+	if (shuffle) {
+		shuffle_letters();
+	}
 	for (i = 0; i < letter_buffer_idx; i++)
 	{
 		uint8_t letter = letter_buffer[i];
@@ -179,6 +181,16 @@ void snow_in_letters(int16_t brite_step, int16_t brite_limit, char stopAt)
 		}
 		fade_in_letter(brite_step, brite_limit, stopAt, letter);
 	}
+}
+
+void snow_in_letters(int16_t brite_step, int16_t brite_limit, char stopAt)
+{
+	fade_in_letters(brite_step, brite_limit, stopAt, 1);
+}
+
+void wipe_in_letters(int16_t brite_step, int16_t brite_limit, char stopAt)
+{
+	fade_in_letters(brite_step, brite_limit, stopAt, 0);
 }
 
 void fade_out_letter(int16_t brite_step, uint8_t letter)
@@ -305,7 +317,7 @@ void set_all_svw(int16_t s, int16_t v, int16_t w)
 
 // if a letter is active, it will take on the S, V, and W values given
 // negative values means "preserve last setting"
-void set_shown_svw(int16_t s, int16_t v, int16_t w)
+void set_shown_hsvw(int16_t h, int16_t s, int16_t v, int16_t w)
 {
 	uint8_t wi, li;
 	for (wi = 0; wi < word_buffer_idx; wi++)
@@ -319,9 +331,11 @@ void set_shown_svw(int16_t s, int16_t v, int16_t w)
 			if (letter == 0xFF) { // end of word
 				break;
 			}
+			hsv_buffer[letter].h = (h >= 0) ? (uint8_t)h : hsv_buffer[letter].h;
 			hsv_buffer[letter].s = (s >= 0) ? (uint8_t)s : hsv_buffer[letter].s;
 			hsv_buffer[letter].v = (v >= 0) ? (uint8_t)v : hsv_buffer[letter].v;
 			hsv_buffer[letter].w = (w >= 0) ? (uint8_t)w : hsv_buffer[letter].w;
 		}
 	}
 }
+

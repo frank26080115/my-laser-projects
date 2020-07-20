@@ -99,6 +99,7 @@ void clock_task(void)
 	static char notFirstRun = 0;
 	static RTC_TimeTypeDef prev = {0}; // previous time used for comparison, difference used to trigger update of display
 	RTC_TimeTypeDef now;
+
 	get_time(&now);
 
 	// run any additional application specific initialization here
@@ -115,11 +116,17 @@ void clock_task(void)
 		return;
 	}
 
+	hbled_on();
+
 	printf("time %02u:%02u:%02u\r\n", now.Hours, now.Minutes, now.Seconds);
 
 	// this comparison checks if the display actually needs to be updated
 	if (is_time_different(&now, &prev) == 0 && notFirstRun != 0) {
 		memcpy(&prev, &now, sizeof(RTC_TimeTypeDef));
+		for (int i = 0; i < 100 && btn_is_pressed_any() == 0; i++) {
+			HAL_Delay(1);
+		}
+		hbled_off();
 		return;
 	}
 
@@ -138,6 +145,8 @@ void clock_task(void)
 
 	// no more initialization required
 	notFirstRun = 1;
+
+	hbled_off();
 }
 
 void reset_buffers(void)
@@ -183,7 +192,7 @@ void show_time(RTC_TimeTypeDef* t, uint8_t fadeInStyle, uint8_t fadeOutStyle)
 	case FADEOUT_SNOW:
 	case FADEOUT_SNOW_2:
 	case FADEOUT_SNOW_3:
-		snow_out_letters(fadeStep * 4);
+		snow_out_letters(fadeStep * 8);
 		break;
 	case FADEOUT_GLOBAL:
 	case FADEOUT_GLOBAL_2:
@@ -226,14 +235,14 @@ void show_time(RTC_TimeTypeDef* t, uint8_t fadeInStyle, uint8_t fadeOutStyle)
 		break;
 	case LIGHTLEVEL_DARK:
 		fadeStep = 0x80 / (1000 / FRAME_DELAY);
-		fadeLimit = 0x80;
+		fadeLimit = LED_DARK_V;
 		stopAt = STOPAT_V;
 		break;
 	case LIGHTLEVEL_NORMAL:
 	default:
 		fadeStep = 0x100 / (1000 / FRAME_DELAY);
 		fadeLimit = 0xFF;
-		stopAt = STOPAT_V;
+		stopAt = STOPAT_W;
 		break;
 	}
 
@@ -243,7 +252,10 @@ void show_time(RTC_TimeTypeDef* t, uint8_t fadeInStyle, uint8_t fadeOutStyle)
 		fade_in_words_all(fadeStep, fadeLimit, stopAt);
 		break;
 	case FADEIN_SNOWLETTERS:
-		snow_in_letters(fadeStep * 4, fadeLimit, stopAt);
+		snow_in_letters(fadeStep * 8, fadeLimit, stopAt);
+		break;
+	case FADEIN_WIPELETTERS:
+		wipe_in_letters(fadeStep * 4, fadeLimit, stopAt);
 		break;
 	case FADEIN_GLOBAL:
 		fade_in_all(fadeStep, fadeLimit, stopAt);
@@ -341,7 +353,8 @@ void check_preserved_rows(RTC_TimeTypeDef* now, RTC_TimeTypeDef* prev)
 	if ((tmp1.Minutes == 0 && tmp2.Minutes == 0) // both uses none
 			|| (tmp1.Minutes >= 1 && tmp2.Minutes >= 1 && tmp1.Minutes <= 6 && tmp2.Minutes <= 6) // both uses "past"
 			|| (tmp1.Minutes >= 7 && tmp2.Minutes >= 7) // both uses "to"
-			) {
+			)
+	{
 		preserveRow = 3;
 	}
 
@@ -539,6 +552,8 @@ void handle_buttons(RTC_TimeTypeDef* now, RTC_TimeTypeDef* prev)
 			break;
 		}
 
+		hbled_on();
+
 		// we only show the nearest 5 minutes so setting time can only set to the nearest 5 minutes
 		round_time(now, &tmp);
 		memcpy(now, &tmp, sizeof(RTC_TimeTypeDef));
@@ -578,6 +593,8 @@ void handle_buttons(RTC_TimeTypeDef* now, RTC_TimeTypeDef* prev)
 				break;
 			}
 		}
+
+		hbled_off();
 	}
 	while (loop != 0);
 }
@@ -586,20 +603,20 @@ void handle_buttons(RTC_TimeTypeDef* now, RTC_TimeTypeDef* prev)
 char handle_lightlevels(void)
 {
 	char changed = 0;
-	#if 0
+#if 1
 	uint8_t readLightLevel = light_read();
 	// when in the dark, but transitioning to brighter light, or user presses button
 	if ((prevLightLevel == LIGHTLEVEL_DARK || currLightLevel == LIGHTLEVEL_DARK) && (readLightLevel != LIGHTLEVEL_DARK || btn_is_pressed_main())) {
 		printf("light level change, brighten\r\n");
 		currLightLevel = LIGHTLEVEL_NORMAL;
-		set_shown_svw(0, 0xFF, readLightLevel == LIGHTLEVEL_BRIGHT ? 0xFF : 0x00);
+		set_shown_hsvw(0, 0, 0xFF, readLightLevel == LIGHTLEVEL_BRIGHT ? 0xFF : 0x00);
 		show_strip(0);
 		changed = 1;
 	}
 	else if (currLightLevel != LIGHTLEVEL_DARK && readLightLevel == LIGHTLEVEL_DARK) {
 		printf("light level change, darken\r\n");
 		currLightLevel = LIGHTLEVEL_DARK;
-		set_shown_svw(0, 0x80, 0x00);
+		set_shown_hsvw(0, 0xFF, LED_DARK_V, 0x00);
 		show_strip(0);
 		changed = 1;
 	}

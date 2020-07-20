@@ -10,12 +10,15 @@
 
 #include <stdint.h>
 
-#define USE_USB_PORT
+//#define USE_USB_PORT
+#define USE_LIGHT_SENSE
 
 #define MATRIX_HEIGHT  8
 #define MATRIX_WIDTH   8
 #define MATRIX_TOTAL   (MATRIX_HEIGHT * MATRIX_WIDTH)
-#define FRAME_DELAY    (1000 / 15)
+#define FRAME_DELAY    (1000 / 25)
+
+#define LED_DARK_V     0x04
 
 #define ADCCHAN_LIGHT ADC_CHANNEL_3
 #define ADCCHAN_POT_A ADC_CHANNEL_4
@@ -25,6 +28,9 @@
 #define btn_is_pressed_up()     (LL_GPIO_IsInputPinSet(GPIOB, LL_GPIO_PIN_0) == 0)
 #define btn_is_pressed_down()   (LL_GPIO_IsInputPinSet(GPIOB, LL_GPIO_PIN_1) == 0)
 #define btn_is_pressed_any()    (btn_is_pressed_main() || btn_is_pressed_up() || btn_is_pressed_down())
+
+#define hbled_on()              do { LL_GPIO_SetOutputPin  (GPIOA, LL_GPIO_PIN_7); } while (0)
+#define hbled_off()             do { LL_GPIO_ResetOutputPin(GPIOA, LL_GPIO_PIN_7); } while (0)
 
 #define power_avail()           (LL_GPIO_IsInputPinSet(GPIOA, LL_GPIO_PIN_0) != 0)
 

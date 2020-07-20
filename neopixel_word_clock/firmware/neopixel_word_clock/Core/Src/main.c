@@ -92,7 +92,18 @@ int main(void)
 
   /* USER CODE BEGIN SysInit */
   }
-  SystemClock_Config_KeepRTC();
+
+	SystemClock_Config_KeepRTC();
+	MX_USART1_UART_Init(); // call UART init here to start printing early, later call is skipped
+
+	printf("\r\n\r\nHELLO WORLD");
+
+	if(__HAL_PWR_GET_FLAG(PWR_FLAG_SB) != RESET) {
+		printf(" AGAIN");
+	}
+	printf(" =============\r\n");
+	print_info();
+
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
@@ -103,6 +114,9 @@ int main(void)
   MX_CRC_Init();
   /* USER CODE BEGIN 2 */
 	power_init();
+	if(__HAL_PWR_GET_FLAG(PWR_FLAG_SB) != RESET) {
+	__HAL_PWR_CLEAR_FLAG(PWR_FLAG_SB);
+	}
 	ws2812b_init();
 	tests();
 
@@ -242,6 +256,7 @@ static void MX_ADC_Init(void)
   {
     Error_Handler();
   }
+#if 0
   /** Configure for the selected ADC regular channel to be converted. 
   */
   sConfig.Channel = ADC_CHANNEL_4;
@@ -256,6 +271,7 @@ static void MX_ADC_Init(void)
   {
     Error_Handler();
   }
+#endif
   /* USER CODE BEGIN ADC_Init 2 */
 
   /* USER CODE END ADC_Init 2 */
@@ -304,8 +320,10 @@ static void MX_RTC_Init(void)
   /* USER CODE BEGIN RTC_Init 0 */
 
 	LL_PWR_EnableBkUpAccess();
-	if (hrtc.Instance->BKP0R != 0xDEADBEEF)
+	__NOP(); __NOP(); __NOP(); __NOP();
+	if ((RCC->CSR & RCC_CSR_RTCEN) == 0)
 	{
+		printf("RTC requires init, BKP0R 0x%08lX\r\n", hrtc.Instance->BKP0R);
 		// LSE requires initialization
 		LL_RCC_ForceBackupDomainReset();
 		LL_RCC_ReleaseBackupDomainReset();
@@ -346,9 +364,11 @@ static void MX_RTC_Init(void)
   }
 
   /* USER CODE BEGIN Check_RTC_BKUP */
-	if (hrtc.Instance->BKP0R == 0xDEADBEEF || __HAL_PWR_GET_FLAG(PWR_FLAG_SB) != RESET) {
+	HAL_RTC_GetDate(&hrtc, &sDate, RTC_FORMAT_BIN);
+	if (sDate.Year >= 20) {
 		return;
 	}
+	printf("RTC time reset\r\n");
   /* USER CODE END Check_RTC_BKUP */
 
   /** Initialize RTC and set the Time and Date 
@@ -366,7 +386,7 @@ static void MX_RTC_Init(void)
   sDate.WeekDay = RTC_WEEKDAY_MONDAY;
   sDate.Month = RTC_MONTH_JANUARY;
   sDate.Date = 1;
-  sDate.Year = 0;
+  sDate.Year = 20;
 
   if (HAL_RTC_SetDate(&hrtc, &sDate, RTC_FORMAT_BIN) != HAL_OK)
   {
@@ -388,6 +408,11 @@ static void MX_USART1_UART_Init(void)
 {
 
   /* USER CODE BEGIN USART1_Init 0 */
+	static char uart_inited = 0;
+	if (uart_inited) {
+		return;
+	}
+	uart_inited = 1;
 
   /* USER CODE END USART1_Init 0 */
 
@@ -453,6 +478,9 @@ static void MX_GPIO_Init(void)
   LL_IOP_GRP1_EnableClock(LL_IOP_GRP1_PERIPH_GPIOB);
 
   /**/
+  LL_GPIO_ResetOutputPin(GPIOA, LL_GPIO_PIN_7);
+
+  /**/
   GPIO_InitStruct.Pin = LL_GPIO_PIN_1;
   GPIO_InitStruct.Mode = LL_GPIO_MODE_ANALOG;
   GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
@@ -475,7 +503,9 @@ static void MX_GPIO_Init(void)
 
   /**/
   GPIO_InitStruct.Pin = LL_GPIO_PIN_7;
-  GPIO_InitStruct.Mode = LL_GPIO_MODE_ANALOG;
+  GPIO_InitStruct.Mode = LL_GPIO_MODE_OUTPUT;
+  GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
+  GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
   GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
   LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
@@ -563,20 +593,25 @@ int __io_putchar(int ch)
 
 int adc_read(uint32_t ch)
 {
+	uint8_t try = 0;
 	uint32_t res;
 	ADC_ChannelConfTypeDef sConfig = {0};
 	sConfig.Channel = ch;
-	if (HAL_ADC_ConfigChannel(&hadc, &sConfig) != HAL_OK) {
-		Error_Handler();
-	}
-	if (HAL_ADC_Start(&hadc) != HAL_OK) {
-		Error_Handler();
-	}
-	while (1)
+	while (try <= 1)
 	{
-		if (HAL_ADC_PollForConversion(&hadc, 10) == HAL_OK) {
-			res = HAL_ADC_GetValue(&hadc);
-			return (int)res;
+		try++;
+		if (HAL_ADC_ConfigChannel(&hadc, &sConfig) != HAL_OK) {
+			Error_Handler();
+		}
+		if (HAL_ADC_Start(&hadc) != HAL_OK) {
+			Error_Handler();
+		}
+		while (1)
+		{
+			if (HAL_ADC_PollForConversion(&hadc, 10) == HAL_OK) {
+				res = HAL_ADC_GetValue(&hadc);
+				break;
+			}
 		}
 	}
 	return (int)res;
@@ -597,8 +632,8 @@ void print_info(void)
 	printf("HAL Version    0x%08lX\r\n", HAL_GetHalVersion());
 	printf("DBGMCU->IDCODE 0x%08lX\r\n", DBGMCU->IDCODE);
 	printf("UID 0x%08lX 0x%08lX 0x%08lX\r\n", HAL_GetUIDw0(), HAL_GetUIDw1(), HAL_GetUIDw2());
-	printf("Version Info:\r\n%s\r\n", version_string(tmpstr));
-	printf("Version CRC: 0x%08lX\r\n", HAL_CRC_Calculate(&hcrc, (uint32_t*)tmpstr, (uint32_t)strlen(tmpstr)));
+	printf("FW Version Info:\r\n%s\r\n", version_string(tmpstr));
+	printf("FW Version CRC: 0x%08lX\r\n", HAL_CRC_Calculate(&hcrc, (uint32_t*)tmpstr, (uint32_t)strlen(tmpstr)));
 }
 
 /* USER CODE END 4 */
