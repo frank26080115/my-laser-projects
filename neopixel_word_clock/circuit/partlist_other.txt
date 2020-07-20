@@ -7,3 +7,5 @@ There are more parts you'll need that's not on the JCL BOM
  * KT11P4SA2M34LFS, button, C&K
  * USB3145-30-1-A, USB connector, Global Connector Technology
  * NSL-5152, light sensor (CdS cell), Advanced Photonix
+ * four #2-56 thread 1/2" long countersink head plastic screws
+ * four plastic hex standoff, 5/16" long, #2-56 thread, 3/16" hex
