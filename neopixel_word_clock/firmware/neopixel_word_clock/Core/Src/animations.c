@@ -298,24 +298,25 @@ void wipe_out(int16_t brite_step, int rowDly, uint8_t mode)
 
 void blank_all(uint8_t s)
 {
-	set_all_svw(s, 0, 0);
+	set_all_hsvw(-1, s, 0, 0);
 }
 
-// set the S, V, and W for all pixels
+// set the H, S, V, and W for all pixels
 // negative values means "preserve last setting"
 // will ignore letters that are supposed to be preserved
-void set_all_svw(int16_t s, int16_t v, int16_t w)
+void set_all_hsvw(int16_t h, int16_t s, int16_t v, int16_t w)
 {
 	uint8_t i, lim = get_xy_idx(0, preserveRow);
 	for (i = 0; i < lim; i++)
 	{
+		hsv_buffer[i].h = (h >= 0) ? (uint8_t)h : hsv_buffer[i].h;
 		hsv_buffer[i].s = (s >= 0) ? (uint8_t)s : hsv_buffer[i].s;
 		hsv_buffer[i].v = (v >= 0) ? (uint8_t)v : hsv_buffer[i].v;
 		hsv_buffer[i].w = (w >= 0) ? (uint8_t)w : hsv_buffer[i].w;
 	}
 }
 
-// if a letter is active, it will take on the S, V, and W values given
+// if a letter is active, it will take on the H, S, V, and W values given
 // negative values means "preserve last setting"
 void set_shown_hsvw(int16_t h, int16_t s, int16_t v, int16_t w)
 {

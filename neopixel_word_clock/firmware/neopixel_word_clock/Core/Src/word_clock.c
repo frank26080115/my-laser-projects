@@ -116,7 +116,9 @@ void clock_task(void)
 		return;
 	}
 
-	hbled_on();
+	if (currLightLevel != LIGHTLEVEL_DARK) {
+		hbled_on();
+	}
 
 	printf("time %02u:%02u:%02u\r\n", now.Hours, now.Minutes, now.Seconds);
 
@@ -203,7 +205,7 @@ void show_time(RTC_TimeTypeDef* t, uint8_t fadeInStyle, uint8_t fadeOutStyle)
 	case FADEOUT_INSTANT_2:
 	case FADEOUT_INSTANT_3:
 	default:
-		blank_all(0);
+		blank_all(currLightLevel == LIGHTLEVEL_DARK ? 0xFF : 0);
 		show_strip(0);
 		break;
 	}
@@ -229,17 +231,20 @@ void show_time(RTC_TimeTypeDef* t, uint8_t fadeInStyle, uint8_t fadeOutStyle)
 	switch (currLightLevel)
 	{
 	case LIGHTLEVEL_BRIGHT:
+		set_all_hsvw(-1, 0, -1, -1);
 		fadeStep = 0x200 / (1000 / FRAME_DELAY);
 		fadeLimit = 0x1FF;
 		stopAt = STOPAT_W;
 		break;
 	case LIGHTLEVEL_DARK:
+		set_all_hsvw(0, 0xFF, -1, -1);
 		fadeStep = 0x80 / (1000 / FRAME_DELAY);
 		fadeLimit = LED_DARK_V;
 		stopAt = STOPAT_V;
 		break;
 	case LIGHTLEVEL_NORMAL:
 	default:
+		set_all_hsvw(-1, 0, -1, -1);
 		fadeStep = 0x100 / (1000 / FRAME_DELAY);
 		fadeLimit = 0xFF;
 		stopAt = STOPAT_W;

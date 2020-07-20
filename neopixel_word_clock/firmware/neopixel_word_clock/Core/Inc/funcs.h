@@ -44,7 +44,7 @@ void hsv_to_rgbw_buffer(pix_t* inPtr, rgbw_t* outPtr, uint8_t cnt);
 char pixel_brighten_linear(pix_t* pix, int16_t x, char stopAt);
 
 void set_shown_hsvw(int16_t h, int16_t s, int16_t v, int16_t w);
-void set_all_svw(int16_t s, int16_t v, int16_t w);
+void set_all_hsvw(int16_t h, int16_t s, int16_t v, int16_t w);
 void blank_all(uint8_t s);
 void fade_in_all(int16_t brite_step, int16_t brite_limit, char stopAt);
 void fade_out_all(int16_t dim);
