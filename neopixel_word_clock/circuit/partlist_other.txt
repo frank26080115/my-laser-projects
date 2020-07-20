@@ -1,0 +1,9 @@
+There are more parts you'll need that's not on the JCL BOM
+
+ * some sort of ST-Link V2, or V3, to flash the compiled code
+ * 8x8 RGBW NeoPixel matrix board from Adafruit
+ * bunch of male pin headers with standard 0.1 inch spacing
+ * CR2032 battery
+ * KT11P4SA2M34LFS, button, C&K
+ * USB3145-30-1-A, USB connector, Global Connector Technology
+ * NSL-5152, light sensor (CdS cell), Advanced Photonix
