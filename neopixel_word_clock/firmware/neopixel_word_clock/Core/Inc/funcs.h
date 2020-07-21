@@ -32,7 +32,7 @@ void debug_framebuffer(void);
 void debug_word(uint8_t word_code);
 void debug_wordbuffer(void);
 void debug_frameshade(void);
-uint8_t light_read(void);
+uint32_t light_read(void);
 void show_strip(int32_t dly);
 
 void time_add_secs(RTC_TimeTypeDef* tin, RTC_TimeTypeDef* tout, int);

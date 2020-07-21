@@ -349,18 +349,19 @@ void check_preserved_rows(RTC_TimeTypeDef* now, RTC_TimeTypeDef* prev)
 	tmp2.Hours %= 12;
 
 	// both uses the same hour word
-	if (tmp1.Hours == tmp2.Hours) {
-		preserveRow = 4;
-	}
-
-	tmp1.Minutes /= 5;
-	tmp2.Minutes /= 5;
-	if ((tmp1.Minutes == 0 && tmp2.Minutes == 0) // both uses none
-			|| (tmp1.Minutes >= 1 && tmp2.Minutes >= 1 && tmp1.Minutes <= 6 && tmp2.Minutes <= 6) // both uses "past"
-			|| (tmp1.Minutes >= 7 && tmp2.Minutes >= 7) // both uses "to"
-			)
+	if (tmp1.Hours == tmp2.Hours)
 	{
-		preserveRow = 3;
+		preserveRow = 4;
+
+		tmp1.Minutes /= 5;
+		tmp2.Minutes /= 5;
+		if ((tmp1.Minutes == 0 && tmp2.Minutes == 0) // both uses none
+				|| (tmp1.Minutes >= 1 && tmp2.Minutes >= 1 && tmp1.Minutes <= 6 && tmp2.Minutes <= 6) // both uses "past"
+				|| (tmp1.Minutes >= 7 && tmp2.Minutes >= 7) // both uses "to"
+				)
+		{
+			preserveRow = 3;
+		}
 	}
 
 #ifdef DEBUG_PRESERVEDROW
@@ -602,37 +603,6 @@ void handle_buttons(RTC_TimeTypeDef* now, RTC_TimeTypeDef* prev)
 		hbled_off();
 	}
 	while (loop != 0);
-}
-
-// returns whether a change has been made
-char handle_lightlevels(void)
-{
-	char changed = 0;
-#if 1
-	uint8_t readLightLevel = light_read();
-	// when in the dark, but transitioning to brighter light, or user presses button
-	if ((prevLightLevel == LIGHTLEVEL_DARK || currLightLevel == LIGHTLEVEL_DARK) && (readLightLevel != LIGHTLEVEL_DARK || btn_is_pressed_main())) {
-		printf("light level change, brighten\r\n");
-		currLightLevel = LIGHTLEVEL_NORMAL;
-		set_shown_hsvw(0, 0, 0xFF, readLightLevel == LIGHTLEVEL_BRIGHT ? 0xFF : 0x00);
-		show_strip(0);
-		changed = 1;
-	}
-	else if (currLightLevel != LIGHTLEVEL_DARK && readLightLevel == LIGHTLEVEL_DARK) {
-		printf("light level change, darken\r\n");
-		currLightLevel = LIGHTLEVEL_DARK;
-		set_shown_hsvw(0, 0xFF, LED_DARK_V, 0x00);
-		show_strip(0);
-		changed = 1;
-	}
-	else {
-		currLightLevel = readLightLevel;
-	}
-	prevLightLevel = currLightLevel;
-#else
-	currLightLevel = LIGHTLEVEL_NORMAL;
-#endif
-	return changed;
 }
 
 void debug_framebuffer(void)

@@ -18,6 +18,8 @@ extern uint8_t letter_buffer[LETTER_BUFF_LEN];
 extern uint8_t letter_buffer_idx;
 extern const uint8_t* word_list[];
 extern uint8_t preserveRow;
+extern uint8_t prevLightLevel;
+extern uint8_t currLightLevel;
 
 extern RTC_HandleTypeDef hrtc;
 extern ADC_HandleTypeDef hadc;
