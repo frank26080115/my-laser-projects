@@ -6,18 +6,22 @@ The SVG files used to laser-cut and laser-etch the acrylic sheets can be downloa
 
 ![](doc/inkscape_screenshot.png)
 
+One disk of black and two disks of the star-studded disks are used for each piece. More star-studded disk can be used but the reflections start to make the photograph appear too dark. Two is my recommendation.
+
 The stickers are printed by Vistaprint.
 
 ![](doc/vistaprint_stickers.png)
 
-The holes on the "back" piece requires a M3 threading tap, so no nuts are required. The holes on the "stars" sheet are sized to be through-holes. The screws are 10mm long M3 threaded screws.
+The holes on the "back" piece requires a M3 threading tap, so no nuts are required. The holes on the "stars" sheet are sized to be through-holes. The screws are 10mm long M3 threaded screws, which is a good size for a stack of 3 acrylic sheets.
 
 ![](doc/m3_screw.png)
 
 ![](doc/m3_threadtap.png)
 
-Sticky magnets are used on the back to turn these into fridge magnets. Place two magnets on each, make sure one magnet is at the bottom, which helps it stand up when placed on a desk.
+Sticky magnets are used on the back to turn these into fridge magnets. Place two magnets on each, make sure one magnet is at the bottom, which helps it stand up when placed on a desk. Make sure the magnets are thicker than how long the screws stick out.
 
 ![](doc/magnets_amazon.png)
 
 ![](doc/magnets_placement.jpg)
+
+During assembly, wear gloves, and keep some lens-wipes and air-duster around to remove smudges and dust.
