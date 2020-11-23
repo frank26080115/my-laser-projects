@@ -2,11 +2,11 @@ This is a small display for my astrophotographs. The photograph is printed on a 
 
 ![](doc/ani_480.gif)
 
-The SVG files used to laser-cut and laser-etch the acrylic sheets can be downloaded from this GitHub repo. The files are layered and optimized for making 6 pieces at a time on A4 sized acrylic sheets. The stars are randomly arranged, and two versions of arrangments are provided (12 different randomizations total).
+The SVG files used to laser-cut and laser-etch the acrylic sheets can be downloaded from this GitHub repo. files are layered and optimized for making 6 pieces at a time on A4 sized acrylic sheets. The stars are randomly arranged, and two versions of arrangments are provided (12 different randomizations total).
 
 ![](doc/inkscape_screenshot.png)
 
-One disk of black and two disks of the star-studded disks are used for each piece. More star-studded disk can be used but the reflections start to make the photograph appear too dark. Two is my recommendation.
+One disk of black and two disks of the clear star-studded disks are used for each piece. More star-studded disk can be used but the reflections start to make the photograph appear too dark. Two is my recommendation.
 
 The stickers are printed by Vistaprint.
 
