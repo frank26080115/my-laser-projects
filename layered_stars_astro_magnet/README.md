@@ -25,3 +25,8 @@ Sticky magnets are used on the back to turn these into fridge magnets. Place two
 ![](doc/magnets_placement.jpg)
 
 During assembly, wear gloves, and keep some lens-wipes and air-duster around to remove smudges and dust.
+
+--------------------------
+Original Picture
+
+![](doc/andromeda_galaxy_starreduced.jpg)
